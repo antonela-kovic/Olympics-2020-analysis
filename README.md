@@ -1,73 +1,62 @@
+# Tokyo 2020 Olympics – Data Analysis
 
-## Analiza podataka OI 2020
+Exploratory and statistical analysis of the Tokyo 2020 Olympic Games in a single Jupyter notebook ([`OI_Projekt.ipynb`](OI_Projekt.ipynb)): data cleaning and merging of six datasets, the relation between GDP and medals, regression and classification of national success, a hypothesis test on gender balance, a time-series analysis of 120 years of Olympic history, a retrieval-augmented question-answering assistant (Gemini) and a quiz built from web-scraped facts.
 
-Ovaj projekt obrađuje i analizira podatke vezane uz Olimpijske igre 2020, koristeći podatke iz nekoliko različitih izvora, uključujući i web scraping te interaktivnu pitalicu temeljenu na LLM modelu. Analize su implementirane u Jupyter Notebook-u `OI_Projekt.ipynb`.
-
----
-
-### Podaci
-
-Analiza uključuje sljedeće izvore podataka:
-
-* **Athletes.xlsx**: Informacije o sportašima (ime, NOC, disciplina). Nema nedostajućih vrijednosti.
-* **Coaches.xlsx**: Imena trenera, NOC, disciplina, događaj. Polje "Event" sadrži dosta nedostajućih vrijednosti.
-* **EntriesGender.xlsx**: Broj muških, ženskih i ukupnih sudionika po disciplini. Nema nedostajućih vrijednosti.
-* **gdp.csv**: Podaci o BDP-u zemalja kroz različite godine (neki nedostajući podaci).
-* **Medals.xlsx**: Rangiranje timova po medaljama. Nema nedostajućih vrijednosti.
-* **Teams.xlsx**: Informacije o timovima prema disciplini i događaju.
-* **Podaci dobiveni web scrapingom**: Prikupljeni s internetskih izvora kako bi se omogućilo kreiranje interaktivnog kviza.
+**Stack:** Python · pandas · NumPy · scikit-learn · SciPy · Matplotlib · seaborn · BeautifulSoup · Google Gen AI SDK (Gemini) · Google Colab
 
 ---
 
-### LLM model (pitalica)
+## Key results
 
-Kako projekt sadrži podatke samo za Olimpijske igre 2020., implementirana je i **LLM pitalica** koja korisnicima omogućuje da postave pitanja o bilo kojim Olimpijskim igrama ikad održanim (npr. “Koji sportaš je osvojio najviše medalja na OI u Riju 2016?”). Pitalica koristi LLM model za generiranje odgovora temeljenih na vanjskim izvorima i znanju modela.
+| Question | Method | Result |
+|---|---|---|
+| Do richer countries win more medals? | Pearson correlation, GDP vs. total medals (78 countries) | r = 0.77, strong positive relation |
+| Can the medal count be predicted? | Multiple linear regression (GDP, number of athletes) | R² = 0.93 on the test set; team size carries almost all the predictive power |
+| Can countries be classified by success? | Logistic regression, four classes by medal quartiles | Weak: the model mostly predicts "Very High" (31 % precision, 100 % recall for that class) |
+| Were men over-represented per discipline? | Welch's t-test, male vs. female entries | t = 0.29, p = 0.77, no significant difference |
+| How did participation change since 1896? | Time series, `athlete_events.csv` | Steady growth of female participation; average age rose from under 24 to over 26 years since the 1980s |
 
----
+## Notebook contents
 
-###  Web scraping
+1. **Loading and cleaning:** missing values per dataset, GDP interpolation across years, duplicates.
+2. **Merging:** Athletes–Teams on NOC, Medals–GDP on country name.
+3. **Analysis:** GDP vs. medals, medal distribution (top 10), athletes per team and discipline.
+4. **Regression and classification** of national success from GDP and team size.
+5. **Hypothesis test:** gender balance of entries per discipline.
+6. **Time series 1896–2016:** female participation and average athlete age.
+7. **LLM question answering (RAG):** medal-table rows of the countries mentioned in a question are retrieved from the data and added to the Gemini prompt.
+8. **Web scraping quiz:** true/false questions from Olympic facts scraped from three Croatian- and Bosnian-language pages.
 
-Za potrebe kviza, projekt koristi **web scraping** za prikupljanje dodatnih podataka o Olimpijskim igrama (npr. popis sportaša, medalja, povijesne činjenice). Ti podaci nadopunjuju analizu i omogućuju korisnicima da postavljaju pitanja izvan okvira podataka iz 2020.
+## Data
 
----
+| File | Content | Source |
+|---|---|---|
+| `Athletes.xlsx`, `Coaches.xlsx`, `EntriesGender.xlsx`, `Medals.xlsx`, `Teams.xlsx` | Tokyo 2020 participants and results | [Kaggle: 2021 Olympics in Tokyo](https://www.kaggle.com/datasets/arjunprasadsarkhel/2021-olympics-in-tokyo) |
+| `gdp.csv` | GDP by country and year (current USD) | [World Bank: GDP (NY.GDP.MKTP.CD)](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD) |
+| `athlete_events.csv` | Olympic athletes 1896–2016 | [Kaggle: 120 years of Olympic history](https://www.kaggle.com/datasets/heesoo37/120-years-of-olympic-history-athletes-and-results) |
 
-###  Ključne značajke
+The data files are not stored in the repository.
 
-* Priprema i čišćenje podataka iz više izvora.
-* Web scraping za proširenje baze podataka kviza.
-* Interaktivna LLM pitalica za odgovaranje na pitanja o Olimpijskim igrama (neovisno o godini).
-* Analiza i vizualizacija podataka za OI 2020.
-* Integracija ekonomskih pokazatelja s rezultatima sportaša.
+## Running
 
----
+**Google Colab:** upload the notebook, put the data files into Google Drive and adjust `DATA_DIR` in the first code cell if needed. For the LLM section, add your Gemini API key as a Colab secret named `GOOGLE_API_KEY`.
 
-###  Kako koristiti
+**Locally:**
 
-1. Klonirajte repozitorij:
+```bash
+pip install pandas numpy scikit-learn scipy matplotlib seaborn openpyxl requests beautifulsoup4 google-genai jupyter
+mkdir data   # put the data files here
+export GOOGLE_API_KEY=...   # only for the LLM section
+jupyter notebook OI_Projekt.ipynb
+```
 
-   ```bash
-   git clone <URL-repozitorija>
-   cd <ime-repozitorija>
-   ```
-2. Instalirajte potrebne biblioteke:
+## Limitations
 
-3. Pokrenite Jupyter Notebook:
+- Medals and GDP are merged on country names, so countries with different names in the two sources (e.g. *United States of America* vs *United States*) are missing from the GDP analysis.
+- The regression and classification test sets contain only about 16 countries.
+- A paired test would be more appropriate than Welch's t-test for the gender comparison, because both counts come from the same disciplines.
+- LLM answers without retrieved data come from the model's own knowledge and can be wrong.
 
-   ```bash
-   jupyter notebook OI_Projekt.ipynb
-   ```
-4. Slijedite bilješke u notebooku za analizu podataka, vizualizaciju i korištenje pitalice.
+## Author
 
----
-
-### Tehnički zahtjevi
-
-* Python 3.x
-* Pandas
-* Numpy
-* BeautifulSoup / Requests (za web scraping)
-* Matplotlib (ili drugi alati za vizualizaciju)
-* LLM biblioteka (npr. OpenAI API ili lokalno trenirani model)
-* Jupyter Notebook
-
----
+Antonela Ković – [GitHub](https://github.com/antonela-kovic)
