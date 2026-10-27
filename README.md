@@ -25,7 +25,7 @@ Exploratory and statistical analysis of the Tokyo 2020 Olympic Games in a single
 5. **Hypothesis test:** gender balance of entries per discipline.
 6. **Time series 1896–2016:** female participation and average athlete age.
 7. **LLM question answering (RAG):** medal-table rows of the countries mentioned in a question are retrieved from the data and added to the Gemini prompt.
-8. **Web scraping quiz:** true/false questions from Olympic facts scraped from three Croatian- and Bosnian-language pages.
+8. **Web scraping quiz:** true/false questions from Olympic facts scraped from three Croatian language pages.
 
 ## Data
 
