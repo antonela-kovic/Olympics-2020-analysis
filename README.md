@@ -52,8 +52,8 @@ jupyter notebook OI_project.ipynb
 
 ## Limitations
 
-- Medals and GDP are merged on country names, so countries with different names in the two sources (e.g. *United States of America* vs *United States*) are missing from the GDP analysis.
-- The regression and classification test sets contain only about 16 countries.
+- Medals and GDP are merged on country names through a hand-made mapping (e.g. *United States of America* → *United States*). *Chinese Taipei* has no World Bank GDP row and is left out; merging on ISO country codes would be more robust.
+- The regression and classification test sets contain only 19 countries.
 - A paired test would be more appropriate than Welch's t-test for the gender comparison, because both counts come from the same disciplines.
 - LLM answers without retrieved data come from the model's own knowledge and can be wrong.
 
