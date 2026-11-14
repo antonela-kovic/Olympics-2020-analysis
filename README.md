@@ -10,9 +10,9 @@ Exploratory and statistical analysis of the Tokyo 2020 Olympic Games in a single
 
 | Question | Method | Result |
 |---|---|---|
-| Do richer countries win more medals? | Pearson correlation, GDP vs. total medals (78 countries) | r = 0.77, strong positive relation |
-| Can the medal count be predicted? | Multiple linear regression (GDP, number of athletes) | R² = 0.93 on the test set; team size carries almost all the predictive power |
-| Can countries be classified by success? | Logistic regression, four classes by medal quartiles | Weak: the model mostly predicts "Very High" (31 % precision, 100 % recall for that class) |
+| Do richer countries win more medals? | Pearson correlation, GDP (2021) vs. total medals | r = 0.83, strong positive relation |
+| Can the medal count be predicted? | Multiple linear regression on standardised GDP and number of athletes | R² = 0.87 on the test set (MSE ≈ 102); about 0.08 medals per athlete. Team size is partly a consequence of success, so the model is not causal |
+| Can countries be classified by success? | Logistic regression on standardised features, four classes by medal quartiles | Accuracy 63 % on 19 test countries (majority class ≈ 32 %); "Very High" is recognised perfectly, the middle classes are often confused |
 | Were men over-represented per discipline? | Welch's t-test, male vs. female entries | t = 0.29, p = 0.77, no significant difference |
 | How did participation change since 1896? | Time series, `athlete_events.csv` | Steady growth of female participation; average age rose from under 24 to over 26 years since the 1980s |
 
@@ -21,7 +21,7 @@ Exploratory and statistical analysis of the Tokyo 2020 Olympic Games in a single
 1. **Loading and cleaning:** missing values per dataset, GDP interpolation across years, duplicates.
 2. **Merging:** Athletes–Teams on NOC, Medals–GDP on country name.
 3. **Analysis:** GDP vs. medals, medal distribution (top 10), athletes per team and discipline.
-4. **Regression and classification** of national success from GDP and team size.
+4. **Regression and classification** of national success from GDP and team size, with the features standardised in a scikit-learn pipeline (GDP and team size differ by about ten orders of magnitude).
 5. **Hypothesis test:** gender balance of entries per discipline.
 6. **Time series 1896–2016:** female participation and average athlete age.
 7. **LLM question answering (RAG):** medal-table rows of the countries mentioned in a question are retrieved from the data and added to the Gemini prompt.
@@ -53,7 +53,8 @@ jupyter notebook OI_project.ipynb
 ## Limitations
 
 - Medals and GDP are merged on country names through a hand-made mapping (e.g. *United States of America* → *United States*). *Chinese Taipei* has no World Bank GDP row and is left out; merging on ISO country codes would be more robust.
-- The regression and classification test sets contain only 19 countries.
+- The regression and classification test sets contain only 19 countries, so R² and accuracy depend strongly on the split; cross-validation would give more stable estimates.
+- The number of athletes is partly a result of sporting success (strong nations qualify for more events), so the high R² does not mean that larger teams cause more medals.
 - A paired test would be more appropriate than Welch's t-test for the gender comparison, because both counts come from the same disciplines.
 - LLM answers without retrieved data come from the model's own knowledge and can be wrong.
 
